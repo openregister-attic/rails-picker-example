@@ -1,0 +1,22 @@
+<%= form_for(answer) do |f| %>
+  <% if answer.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(answer.errors.count, "error") %> prohibited this answer from being saved:</h2>
+
+      <ul>
+      <% answer.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :location_code, "Enter your country of birth" %>
+    <%= f.select :location_code, options_for_select(locations_for_select, @answer.location_code) %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

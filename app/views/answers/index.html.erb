@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Answers</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Location</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @answer_counts.each do |answer| %>
+      <tr>
+        <td><%= location_code_to_name(answer[:location_code]) %></td>
+        <td><%= answer[:count] %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Answer', new_answer_path %>
