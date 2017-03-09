@@ -116,14 +116,12 @@ Before we move on to other issues, as this is a location picker, we'll want to p
 def locations_for_select
   country_register = OpenRegister.register 'country'
   territory_register = OpenRegister.register 'territory'
-  countries = country_register._records.map { |r| [r.name, r.country]}
-  territories = territory_register._records.map { |r| [r.name, r.territory]}
+  countries = country_register._all_records.map { |r| [r.name, r.country]}
+  territories = territory_register._all_records.map { |r| [r.name, r.territory]}
   locations = countries + territories
   locations.sort { |x, y| x[0] <=> y[0] }
 end
 ```
-
-TODO: Set the pagination limit correctly in the above code so it actually fetches all the countries.
 
 At this point, assuming the new list of countries and territories matches the one that was previously in place, the select will be successfully populated from the Registers on render.
 
@@ -131,7 +129,7 @@ TODO: Talk about exclusions here?
 
 There are a few issues.
 
-The main one is that the helper is currently performing an HTTP call to the live Registers in order to fetch the list of locations. Even with a cache that would alleviate the latency issues somewhat, should Registers go down for an extended period of time, the cache would eventually flush, and you'd lose access to the list of locations.
+The main one is that the helper is currently performing a blocking HTTP call to the live Registers in order to fetch the list of locations. Even with a cache that would alleviate the latency issues somewhat, should Registers go down for an extended period of time, the cache would eventually flush, and you'd lose access to the list of locations.
 
 This approach also does not scale to other use cases that use Registers with more than a few hundred items. We won't be tackling those use cases in this guide.
 
@@ -140,3 +138,97 @@ Because of the issues above, it makes sense to persist this data in some way. Be
 ### Persisting the data
 
 > Note that the register also [provides ways to download it as CSV, TSV, YAML, plain JSON](https://country.register.gov.uk/records). It might make sense for your project to not use a database for this step, in particular if you don't already have one.
+
+The easiest way to persist something in Rails is to create an ActiveRecord model:
+
+```bash
+rails generate model Location code:string name:string start_date:date end_date:date
+```
+
+We'll add a few indexes and database validations to the migration script:
+
+```ruby
+class CreateLocations < ActiveRecord::Migration[5.0]
+  def change
+    create_table :locations do |t|
+      t.string :code, limit: 30, null: false
+      t.string :name, limit: 100, null: false
+      t.date :start_date
+      t.date :end_date
+
+      t.timestamps
+    end
+
+    add_index :locations, :code, unique: true
+    add_index :locations, :name, unique: true
+    add_index :locations, [:start_date, :end_date]
+  end
+end
+```
+
+And a few model validations:
+
+```ruby
+class Location < ApplicationRecord
+  validates :code, presence: true, length: { maximum: 30 }
+  validates :name, presence: true, length: { maximum: 100 }
+end
+```
+
+We should also create a migration to seed the initial locations:
+
+```ruby
+class ImportInitialLocations < ActiveRecord::Migration[5.0]
+  def up
+    # Data is taken from https://country.register.gov.uk/records
+    Location.create!(code: "AF", name: "Afghanistan", start_date: nil, end_date: nil)
+    Location.create!(code: "AL", name: "Albania", start_date: nil, end_date: nil)
+    # …snip…
+    # Data is taken from https://territory.register.gov.uk/records
+    Location.create!(code: "AE-AZ", name: "Abu Dhabi", start_date: nil, end_date: nil)
+    Location.create!(code: "AE-AJ", name: "Ajman", start_date: nil, end_date: nil)
+    # …snip…
+  end
+
+  def down
+    Location.delete_all
+  end
+end
+```
+
+We can use this script to generate the full list to paste into the migration:
+
+```ruby
+require 'openregister'
+
+country_register = OpenRegister.register 'country'
+territory_register = OpenRegister.register 'territory'
+countries = country_register._all_records.sort_by(&:name)
+territories = territory_register._all_records.sort_by(&:name)
+
+cs = countries.map { |r|
+  start_date = r.start_date ? "\"#{r.start_date}\"" : "nil"
+  end_date = r.end_date ? "\"#{r.end_date}\"" : "nil"
+  "Location.create!(code: \"#{r.country}\", name: \"#{r.name}\", start_date: #{start_date}, end_date: #{end_date})"
+}
+ts = territories.map { |r|
+  start_date = r.start_date ? "\"#{r.start_date}\"" : "nil"
+  end_date = r.end_date ? "\"#{r.end_date}\"" : "nil"
+  "Location.create!(code: \"#{r.territory}\", name: \"#{r.name}\", start_date: #{start_date}, end_date: #{end_date})"
+}
+
+puts(cs.join("\n"))
+puts(ts.join("\n"))
+```
+
+After running the migration, we should have all the locations in the database. We can update the `locations_for_select` method to use this list:
+
+```ruby
+def locations_for_select
+  Location.pluck(:name, :code)
+end
+```
+
+TODO: Move logic inside model. Take into account the `current` list of countries. Sort results alphabetically.
+
+Now that our data is nice and persisted, let's add something to keep it up to date.
