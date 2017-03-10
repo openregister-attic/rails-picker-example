@@ -1,4 +1,4 @@
-How to integrate a Registers-backed Location Picker into a Rails project
+(DRAFT) How to integrate a Registers-backed Location Picker into a Rails project
 ===
 
 This guide will show you how to:
@@ -232,3 +232,77 @@ end
 TODO: Move logic inside model. Take into account the `current` list of countries. Sort results alphabetically.
 
 Now that our data is nice and persisted, let's add something to keep it up to date.
+
+### Keeping the data up to date
+
+Our application is keeping track of locations locally, but it won't update when new countries or territories are added to the register.
+
+To do this, we'll create a job:
+
+```bash
+rails generate job fetch_locations_from_registers
+```
+
+We'll tell the job to fetch all of the latest entries from the countries and territories register, and update or create the respective entries:
+
+```ruby
+require "openregister"
+
+class FetchLocationsFromRegistersJob < ApplicationJob
+  queue_as :default
+
+  def perform(*args)
+    locations.each do |l|
+      location = Location.find_or_initialize_by(code: l[:code])
+
+      location.name = l[:name]
+      location.start_date = l[:start_date]
+      location.end_date = l[:end_date]
+
+      if location.changed? || location.new_record?
+        location.save!
+      end
+    end
+  end
+
+  private
+
+  def countries
+    country_register = OpenRegister.register 'country'
+    country_register._all_records.map { |r|
+      { code: r.country, name: r.name, start_date: r.start_date, end_date: r.end_date }
+    }
+  end
+
+  def territories
+    territory_register = OpenRegister.register 'territory'
+    territory_register._all_records.map { |r|
+      { code: r.territory, name: r.name, start_date: r.start_date, end_date: r.end_date }
+    }
+  end
+
+  def locations
+    countries + territories
+  end
+end
+```
+
+TODO: Doesn't handle entries that have been removed. Doesn't handle errors. Doesn't log. Doesn't handle exceptions.
+
+We can run the job manually like this:
+
+```ruby
+rails runner "FetchLocationsFromRegistersJob.perform_now"
+```
+
+However, we should schedule it to run periodically. We can use [whenever](https://github.com/javan/whenever). We'll install the gem, run `wheneverize .`, and edit the generated `config/schedule.rb`:
+
+```ruby
+every :day, at: '1.15am' do
+  runner "FetchLocationsFromRegistersJob.perform_now", output: nil
+end
+```
+
+TODO: I haven't tested this.
+
+Now we're pulling in data from Registers, persisting it, and then also keeping it up to date. It's time to enhance the location picker into something that is nicer to use.
