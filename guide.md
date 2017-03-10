@@ -99,7 +99,7 @@ require 'openregister'
 
 def locations_for_select
   register = OpenRegister.register 'country'
-  records = register._records
+  records = register._all_records
   records.map { |r| [r.name, r.country]}
 end
 ```
