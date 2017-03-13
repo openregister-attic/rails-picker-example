@@ -12,8 +12,8 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :location_code, "Enter your country of birth" %>
-    <%= f.select :location_code, options_for_select(locations_for_select, @answer.location_code) %>
+    <%= f.label :location_code, "Enter your country of birth", for: 'location_picker' %>
+    <%= f.select :location_code, options_for_select(locations_for_select, @answer.location_code), {}, id: 'location_picker' %>
   </div>
 
   <div class="actions">
