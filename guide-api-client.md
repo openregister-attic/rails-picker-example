@@ -1,4 +1,4 @@
-(DRAFT) How to integrate a Registers-backed Location Picker into a Rails project
+(DRAFT/INCOMPLETE) How to integrate a Registers-backed Location Picker into a Rails project
 ===
 
 This guide will show you how to:
@@ -306,3 +306,7 @@ end
 TODO: I haven't tested this.
 
 Now we're pulling in data from Registers, persisting it, and then also keeping it up to date. It's time to enhance the location picker into something that is nicer to use.
+
+### Enhance the frontend
+
+TODO: Write this section.
