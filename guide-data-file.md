@@ -100,8 +100,8 @@ The example application uses location picker data in a simple HTML `<select>` el
 ```html
 # app/views/answers/_form.html.erb
 
-<%= f.label :location_code, "Enter your country of birth" %>
-<%= f.select :location_code, options_for_select(locations_for_select, @answer.location_code) %>
+<%= f.label :location_code, "Enter your country of birth", for: "location_picker" %>
+<%= f.select :location_code, options_for_select(locations_for_select, @answer.location_code), {}, id: "location_picker" %>
 ```
 
 We need to include this CSS and JS in our `layouts/application.html.erb`:
