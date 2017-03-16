@@ -16,13 +16,17 @@ This guide assumes you have a service that is written in Ruby on Rails and asks 
 
 ![An image consisting of a web form. There is a title that asks "What is your country of birth." There is a select box that has the preselected value of "United Kingdom". There is a submit button at the bottom.](example-form.png)
 
-:warning: TODO: Style the example app to look GDSy.
+> :warning: TODO: Style the example app to look GDSy.
+>
+> This involves throwing a bucket of GOVUK paint on the example application and makes the docs looks slightly prettier and more finished. It's very low priority.
 
 At the end, your location picker will be populated automatically with data from Registers, and will look and function more like this:
 
 ![An animated image consisting of a web form. There is a label that reads "Country of birth." There is an empty text field. The text field is selected, and the characters "U N I" are typed in. A menu appears under the text field, it contains matching countries: "United Kingdom," "United States," "United Arab Emirates," "Tunisia." The first option, "United Kingdom", is clicked on. The text field now updates to contain "United Kingdom." The animation loops from the beginning.](location-picker-example.gif)
 
-:warning: TODO: Replace with a gif of the actual location picker running in the same example app.
+> :warning: TODO: Replace with a gif of the actual location picker running in the same example app.
+>
+> The current gif is from Ed and it's from a different app, and looks out of place. This task can only be truly done after most of the other TODOs in this document are done but will make the docs look more finished and relevant. Low priority.
 
 ## The example application
 
@@ -73,7 +77,12 @@ The `location-picker-canonical-list.json` file contains an array of arrays conta
 [["Abu Dhabi", "AE-AZ"], ["Afghanistan", "AF"], …]
 ```
 
-:warning: TODO: Change to use curies instead.
+> :warning: TODO: Change to use curies instead.
+>
+> This is a file I generated for use on the Rails server to produce the initial un-typeaheaded select. I made it with country codes but Andy convinced me to use node names (which are curies 90% of the time).
+>
+> We need to update the file to contain `[NAME, NODE_NAME]` pairs, so `["Abu Dhabi", "AE-AZ"]` becomes `["Abu Dhabi", "territory:AE-AZ"]`.
+
 
 We can use this array directly as the data source for our select:
 
@@ -85,11 +94,17 @@ end
 
 The app is now successfully pulling in Registers data to display the list of countries. For users that don't have JavaScript, this is the experience they will continue receiving, but now it's time to make it better.
 
-:warning: TODO: Discuss migrating from existing result formats (names, ISO codes) to curies.
+> :warning: TODO: Discuss migrating from existing result formats (names, ISO codes) to curies.
+>
+> In addition to the above task, we should briefly discuss in the documentation about how an existing application that is built to use "country codes" could implement support for node names. I think we could demonstrate how to create a mapping from node names to "country codes" here as that's a likely real use case.
 
-:warning: TODO: Discuss keeping the data up to date. Job included with the gem to check for new versions? Ask people to do it periodically manually?
+> :warning: TODO: Discuss keeping the data up to date. Job included with the gem to check for new versions? Ask people to do it periodically manually?
+>
+> The current documentation suggests that you should copy and paste two JSON files into your application, but offers no path to keep them up to date.
 
-:warning: TODO: Discuss exclusions here? Provide helper methods?
+> :warning: TODO: Discuss exclusions here? Provide helper methods?
+>
+> The current documentation does not discuss in any way what users should do when they need to exclude or add certain locations, to interface with their legacy systems or to accommodate their business requirement.
 
 ### Progressively enhancing to a typeahead
 
@@ -113,9 +128,13 @@ We need to include this CSS and JS in our `layouts/application.html.erb`:
 <script src="https://unpkg.com/accessible-typeahead@0.3.1"></script>
 ```
 
-:warning: TODO: Replace link to suggestion engine in above.
+> :warning: TODO: Replace link to suggestion engine in above.
+>
+> There's a path to a script that should go there that should provide a function called `locationPickerSuggestions`. This function should take one argument, a path to a graph data file, and encapsulate the code for the [most recent suggestion engine I built in the prototype](https://github.com/openregister/picker-prototypes/blob/master/app/views/location-picker-7.html#L75-L245). In broad strokes it needs to fetch the graph file, generate a reverse map, feed the keys into Bloodhound, and then wrap the results from Bloodhound with the node matching code from the suggestion engine I linked to.
 
-:warning: TODO: Provide a gem / better ways to obtain / vendor these.
+> :warning: TODO: Provide a gem / better ways to obtain / vendor these.
+>
+> The docs ask you to hotlink to the stylesheet and scripts for the typeahead. We should provide gems or packages so that users can use them more safely.
 
 In our main `application.js`, we can do this:
 
@@ -128,6 +147,14 @@ AccessibleTypeahead({
 })
 ```
 
-:warning: TODO: Allow the typeahead to enhance a `<select>` menu in-place, the `enhanceSelectEl` option.
+> :warning: TODO: Allow the typeahead to enhance a `<select>` menu in-place, the `enhanceSelectEl` option.
+>
+> The typeahead should have a `enhanceSelectEl` which:
+>
+> - Takes an existing `<select>` element
+> - Hides it visually and from screen readers
+> - Places a typeahead input field in the same support
+> - Hooks the typeahead to the select's `<label>` if it exists
+> - When a value is selected in the typeahead, update the hidden `<select>`
 
 That should be it. This will render the same `<select>` menu as before on the server, but hides it and progressively enhances to a typeahead when JavaScript kicks in. When the user selects something in the typeahead, the hidden `<select>` menu is still updated, so everything works as before.
