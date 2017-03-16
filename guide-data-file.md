@@ -89,8 +89,6 @@ The app is now successfully pulling in Registers data to display the list of cou
 
 :warning: TODO: Discuss keeping the data up to date. Job included with the gem to check for new versions? Ask people to do it periodically manually?
 
-:warning: TODO: Discuss what to do when users don't rely on ISO 3166-1 codes as keys.
-
 :warning: TODO: Discuss exclusions here? Provide helper methods?
 
 ### Progressively enhancing to a typeahead
@@ -132,8 +130,4 @@ AccessibleTypeahead({
 
 :warning: TODO: Allow the typeahead to enhance a `<select>` menu in-place, the `enhanceSelectEl` option.
 
-:warning: TODO: Create the `locationPickerSuggestions` function.
-
 That should be it. This will render the same `<select>` menu as before on the server, but hides it and progressively enhances to a typeahead when JavaScript kicks in. When the user selects something in the typeahead, the hidden `<select>` menu is still updated, so everything works as before.
-
-:warning: TODO: Update select menu when an option is selected in the typeahead.
