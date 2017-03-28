@@ -124,8 +124,11 @@ We need to include this CSS and JS in our `layouts/application.html.erb`:
 <link rel="stylesheet" href="https://unpkg.com/accessible-typeahead@0.3.1/examples/styled.css" />
 
 <!-- At the end of your <body> -->
-<script src="TODO: LINK TO SUGGESTION ENGINE SCRIPT HERE"></script>
-<script src="https://unpkg.com/accessible-typeahead@0.3.1"></script>
+<script type="text/javascript" src="https://unpkg.com/lodash@4.17.4"></script>
+<script type="text/javascript" src="https://unpkg.com/jquery@1.11.3"></script>
+<script type="text/javascript" src="https://unpkg.com/corejs-typeahead@1.1.1/dist/bloodhound.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/openregister/rails-picker-example/guide-data-file/public/suggestion-engine.js"></script>
+<script type="text/javascript" src="https://unpkg.com/accessible-typeahead@0.3.1"></script>
 ```
 
 > :warning: TODO: Replace link to suggestion engine in above.
