@@ -131,9 +131,13 @@ We need to include this CSS and JS in our `layouts/application.html.erb`:
 <script type="text/javascript" src="https://unpkg.com/accessible-typeahead@0.3.1"></script>
 ```
 
-> :warning: TODO: Replace link to suggestion engine in above.
+> :warning: TODO: Productise suggestion engine.
 >
-> There's a path to a script that should go there that should provide a function called `locationPickerSuggestions`. This function should take one argument, a path to a graph data file, and encapsulate the code for the [most recent suggestion engine I built in the prototype](https://github.com/openregister/picker-prototypes/blob/master/app/views/location-picker-7.html#L75-L245). In broad strokes it needs to fetch the graph file, generate a reverse map, feed the keys into Bloodhound, and then wrap the results from Bloodhound with the node matching code from the suggestion engine I linked to.
+> - It should not depend on jQuery, Bloodhound, Lodash
+> - It should not use bleeding edge Chrome only JS
+> - It needs tests
+> - It needs error handling
+
 
 > :warning: TODO: Provide a gem / better ways to obtain / vendor these.
 >
