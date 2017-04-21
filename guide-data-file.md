@@ -147,7 +147,7 @@ In our main `application.js`, we can do this:
 
 ```js
 var pathToGraph = 'public/location-picker-graph.json'
-var selectId = '#location_picker'
+var selectId = 'location_picker'
 AccessibleTypeahead({
   enhanceSelectEl: document.getElementById(selectId),
   source: locationPickerSuggestions(pathToGraph)
