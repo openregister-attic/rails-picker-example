@@ -135,12 +135,14 @@ We need to include this CSS and JS in our `layouts/application.html.erb`:
 In our main `application.js`, we can do this:
 
 ```js
-var pathToGraph = 'public/location-picker-graph.json'
-var selectId = 'location_picker'
-AccessibleTypeahead.enhanceSelectElement({
-  selectElement: document.getElementById(selectId),
-  source: locationPickerSuggestions(pathToGraph)
-})
+var pathToGraph = '/location-picker-graph.json'
+var selectElement = document.getElementById('location_picker')
+if (selectElement) {
+  AccessibleTypeahead.enhanceSelectElement({
+    selectElement: selectElement,
+    source: locationPickerSuggestions(pathToGraph)
+  })
+}
 ```
 
 That should be it. This will render the same `<select>` menu as before on the server, but hides it and progressively enhances to a typeahead when JavaScript kicks in. When the user selects something in the typeahead, the hidden `<select>` menu is still updated, so everything works as before.

@@ -14,3 +14,12 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
+
+var pathToGraph = '/location-picker-graph.json'
+var selectElement = document.getElementById('location_picker')
+if (selectElement) {
+  AccessibleTypeahead.enhanceSelectElement({
+    selectElement: selectElement,
+    source: locationPickerSuggestions(pathToGraph)
+  })
+}
