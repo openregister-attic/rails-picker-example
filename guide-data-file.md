@@ -121,23 +121,12 @@ We need to include this CSS and JS in our `layouts/application.html.erb`:
 
 ```html
 <!-- In your <head> -->
-<link rel="stylesheet" href="https://unpkg.com/accessible-typeahead@0.3.1/examples/styled.css" />
+<link rel="stylesheet" href="https://unpkg.com/accessible-typeahead@0.4.0/examples/styled.css" />
 
 <!-- At the end of your <body> -->
-<script type="text/javascript" src="https://unpkg.com/lodash@4.17.4"></script>
-<script type="text/javascript" src="https://unpkg.com/jquery@1.11.3"></script>
-<script type="text/javascript" src="https://unpkg.com/corejs-typeahead@1.1.1/dist/bloodhound.js"></script>
-<script type="text/javascript" src="https://cdn.rawgit.com/openregister/rails-picker-example/guide-data-file/public/suggestion-engine.js"></script>
-<script type="text/javascript" src="https://unpkg.com/accessible-typeahead@0.3.1"></script>
+<script type="text/javascript" src="https://unpkg.com/registers-picker-engine@0.0.1"></script>
+<script type="text/javascript" src="https://unpkg.com/accessible-typeahead@0.4.0"></script>
 ```
-
-> :warning: TODO: Productise suggestion engine.
->
-> - It should not depend on jQuery, Bloodhound, Lodash
-> - It should not use bleeding edge Chrome only JS
-> - It needs tests
-> - It needs error handling
-
 
 > :warning: TODO: Provide a gem / better ways to obtain / vendor these.
 >
@@ -148,20 +137,10 @@ In our main `application.js`, we can do this:
 ```js
 var pathToGraph = 'public/location-picker-graph.json'
 var selectId = 'location_picker'
-AccessibleTypeahead({
-  enhanceSelectEl: document.getElementById(selectId),
+AccessibleTypeahead.enhanceSelectElement({
+  selectElement: document.getElementById(selectId),
   source: locationPickerSuggestions(pathToGraph)
 })
 ```
-
-> :warning: TODO: Allow the typeahead to enhance a `<select>` menu in-place, the `enhanceSelectEl` option.
->
-> The typeahead should have a `enhanceSelectEl` which:
->
-> - Takes an existing `<select>` element
-> - Hides it visually and from screen readers
-> - Places a typeahead input field in the same support
-> - Hooks the typeahead to the select's `<label>` if it exists
-> - When a value is selected in the typeahead, update the hidden `<select>`
 
 That should be it. This will render the same `<select>` menu as before on the server, but hides it and progressively enhances to a typeahead when JavaScript kicks in. When the user selects something in the typeahead, the hidden `<select>` menu is still updated, so everything works as before.
